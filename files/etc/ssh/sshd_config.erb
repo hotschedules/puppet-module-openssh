@@ -1,0 +1,73 @@
+# vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 foldmethod=marker
+# 
+# WARNING: This file is managed by puppet
+#
+
+# Daemon
+Port <%= @port %>
+AddressFamily <%= @addressfamily %>
+Protocol 2
+
+# Logging
+SyslogFacility <%= @syslogfacility %>
+LogLevel <%= @_loglevel %>
+PrintMotd yes
+PrintLastLog yes
+
+# Auth
+PermitRootLogin <%= @permitrootlogin %>
+PasswordAuthentication <%= @passwordauthentication %>
+ChallengeResponseAuthentication <%= @challengeresponseauthentication %>
+PubkeyAuthentication <%= @pubkeyauthentication %>
+UsePAM <%= @usepam %>
+<% if @allowgroups != :undef -%>
+AllowGroups <% @allowgroups.each do |group| -%> <%= group -%><% end -%> <% if @sftp_ext_config -%><%= @sftp_group -%><% end -%>
+<% end %>
+
+# Crypto / Security settings
+<% if @kexalgorithms != :undef -%>
+KexAlgorithms <%= @kexalgorithms %>
+<% end -%>
+
+# Accept locale-related environment variables
+AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
+AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
+AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE
+
+# These hosts don't run X11
+<% if @x11forwarding == :undef -%>
+X11Forwarding no
+<% elsif @x11forwarding == true -%>
+# .. except for when they do
+X11Forwarding yes
+X11DisplayOffset 10
+<% end -%>
+
+# Prevent the use of insecure home directory and key file permissions
+StrictModes yes
+# The numbers represent start:rate:full legends.
+MaxStartups 4:50:5
+Subsystem	sftp	/usr/libexec/openssh/sftp-server
+
+<% if @maxsessions -%>
+# Multiplexing easily pushes past the default of 10 sessions
+MaxSessions <%= @maxsessions %>
+<% end -%>
+
+<% if @lpk -%>
+# OpenSSH LPK Support
+AuthorizedKeysCommand       <%= @authorizedkeyscommand %>
+AuthorizedKeysCommandUser   <%= @authorizedkeyscommanduser %>
+<% end -%>
+
+UseDNS <%= @usedns %>
+
+<% if @sftp_ext_config %>
+Match Group <%= @sftp_group %>
+ ChrootDirectory <%= @sftp_chrootdir %>
+ ForceCommand <%= @sftp_forcecommand %>
+ AllowTcpForwarding no
+ PermitTunnel no
+ X11Forwarding no
+<% end -%>
+
