@@ -7,42 +7,14 @@ class openssh(
     'openssh-server',
     'openssh-clients',
   ],
-  $port                             = 22,
-  $addressfamily                    = 'any',
-  $syslogfacility                   = 'AUTHPRIV',
-  $_loglevel                        = 'VERBOSE',
-  $permitrootlogin                  = 'forced-commands-only',
-  $passwordauthentication           = 'yes',
-  $challengeresponseauthentication  = 'no',
-  $usepam                           = 'yes',
-  $kexalgorithms                    = undef,
-  $sftp_ext_config                  = undef,
-  $sftp_group                       = undef,
-  $sftp_forcecommand                = undef,
-  $sftp_chrootdir                   = undef,
-  $allowgroups                      = [
-    'ec2-user',
-    'adm',
-    "${::environment}_ssh_login",
-  ],
-  $pubkeyauthentication             = 'yes',
-  $maxsessions                      = undef,
-  $lpk                              = false,
-  $usedns                           = 'yes',
-  $authorizedkeyscommand            = '/usr/libexec/openssh/ssh-ldap-wrapper',
-  $authorizedkeyscommanduser        = 'sshkeys',
+  $sshd_config                      = {},
+  $ldap_conf                        = undef,
 ) {
-
-  if hiera("openssh::x11forwarding", undef) == undef {
-    $x11forwarding = false
-  } else {
-    $x11forwarding = hiera("openssh::x11forwarding")
-  }
 
   clabs::module::init { $name: }
 
   # LDAP Public Keys
-  if $lpk {
+  unless $ldap_conf == undef {
     class { "::${name}::lpk": require => Class["::${name}::config"] }
     contain "${name}::lpk"
   }
