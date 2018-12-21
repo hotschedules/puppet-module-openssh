@@ -5,53 +5,44 @@
 class openssh::lpk(
 
   $packages         = [ 'openssh-ldap' ],
-  $user             = 'sshkeys',
-  $uid              = '333',
-  $gid              = '333',
+  $user             = 'sshd',
+  $group            = 'sshd',
+  $uid              = undef,
+  $gid              = undef,
 
 ) inherits openssh {
 
-  if (
-    (($::lsbdistid == 'RedHat') and ($::lsbdistrelease >= 6.4))
-    or
-    (($::lsbdistid == 'AmazonAMI') and ($::lsbdistrelease >= '2013.09'))
-    ) {
-      clabs::install { $packages:; }
+  clabs::install { $packages:; }
 
-      group {
-        $user:
-          ensure      => 'present',
-          gid         => $gid,
-          forcelocal  => true,
-      }
+  # Standard RPM installations for this create usable user
+  # and group (sshd:sshd) for this.  The following is really
+  # a legacy configuration and really is not necessary.
 
-      clabs::user {
-        $user:
-          comment     => 'OpenSSH LDAP Public Keys',
-          ensure      => 'present',
-          managehome  => false,
-          uid         => $uid,
-          gid         => $gid,
-          shell       => '/sbin/nologin',
-          password    => '*',
-          system      => true,
-          home        => '/etc/ssh',
-          require     => Group[$user],
-      }
+#    group {
+#      $group:
+#        ensure      => 'present',
+#        gid         => $gid,
+#        forcelocal  => true,
+#    }
+#    clabs::user {
+#      $user:
+#        comment     => 'Privilege-separated SSH',
+#        ensure      => 'present',
+#        managehome  => false,
+#        uid         => $uid,
+#        gid         => $gid,
+#        shell       => '/sbin/nologin',
+#        password    => '!!',
+#        system      => true,
+#        home        => '/var/empty/sshd',
+#        require     => Group[$group],
+#    }
 
-      clabs::template { '/etc/ssh/ldap.conf':
-        owner   => $user,
-        group   => $user,
-        mode    => '440',
-        require => Clabs::User[$user],
-        notify  => Service[$svc],
-      }
-
-  } else {
-    clabs::module::unsupported { $name:
-      msg => "OpenSSH LPK is not supported on this OS release."
-    }
+  clabs::template { '/etc/ssh/ldap.conf':
+    owner   => $user,
+    group   => $group,
+    mode    => '440',
+    notify  => Service[$svc],
   }
 
 }
-
