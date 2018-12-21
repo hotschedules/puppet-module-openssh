@@ -14,7 +14,7 @@ class openssh(
   clabs::module::init { $name: }
 
   # LDAP Public Keys
-  if defined($ldap_conf) {
+  unless $ldap_conf == undef {
     class { "::${name}::lpk": require => Class["::${name}::config"] }
     contain "${name}::lpk"
   }
