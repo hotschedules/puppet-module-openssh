@@ -8,13 +8,6 @@ class openssh::lpk(
   $user             = 'sshkeys',
   $uid              = '333',
   $gid              = '333',
-  $tls_checkpeer    = 'yes',
-  $tls_cacertfile   = '/etc/openldap/cacerts/cacert.pem',
-  $uri              = undef,
-  $base_dn          = undef,
-  $bind_dn          = undef,
-  $bind_pass        = undef,
-  $ldap_conf        = undef,
 
 ) inherits openssh {
 
