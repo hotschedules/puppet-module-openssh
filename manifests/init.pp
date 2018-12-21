@@ -31,6 +31,8 @@ class openssh(
   $usedns                           = 'yes',
   $authorizedkeyscommand            = '/usr/libexec/openssh/ssh-ldap-wrapper',
   $authorizedkeyscommanduser        = 'sshkeys',
+  $sshd_config                      = {},
+  $ldap_conf                        = {},
 ) {
 
   if hiera("openssh::x11forwarding", undef) == undef {

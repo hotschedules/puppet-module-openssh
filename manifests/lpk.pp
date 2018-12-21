@@ -14,6 +14,7 @@ class openssh::lpk(
   $base_dn          = undef,
   $bind_dn          = undef,
   $bind_pass        = undef,
+  $ldap_conf        = undef,
 
 ) inherits openssh {
 
