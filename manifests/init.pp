@@ -7,9 +7,10 @@ class openssh(
     'openssh-server',
     'openssh-clients',
   ],
-  $sshd_config                      = {},
-  $ldap_conf                        = undef,
 ) {
+
+  $sshd_config = hiera_hash('openssh::sshd_config',{})
+  $ldap_conf = hiera_hash('openssh::ldap_conf',undef)
 
   clabs::module::init { $name: }
 
